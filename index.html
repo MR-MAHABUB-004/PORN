@@ -1,106 +1,182 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Porn Video Sender</title>
-    <style>
-        body {
-            font-family: 'Arial', sans-serif;
-            background: #121212;
-            color: white;
-            text-align: center;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-        }
-        h1 {
-            font-size: 24px;
-            margin-bottom: 10px;
-        }
-        .video-container {
-            width: 80%;
-            max-width: 800px;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0px 4px 10px rgba(255, 255, 255, 0.2);
-        }
-        iframe {
-            width: 100%;
-            height: 450px;
-            border: none;
-            background: black;
-        }
-        .btn-container {
-            margin-top: 15px;
-        }
-        button {
-            padding: 12px 20px;
-            font-size: 16px;
-            color: white;
-            background: #1DB954;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background 0.3s;
-            outline: none;
-        }
-        button:hover {
-            background: #17a147;
-        }
-        .loading {
-            font-size: 18px;
-            margin-top: 20px;
-            display: none;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Category Video Player</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #121212;
+      color: white;
+      margin: 0;
+    }
+    header {
+      display: flex;
+      padding: 10px;
+      background: #1a1a1a;
+      gap: 10px;
+    }
+    .category-btn {
+      padding: 8px 16px;
+      background: #333;
+      border: none;
+      border-radius: 4px;
+      color: white;
+      cursor: pointer;
+    }
+    .category-btn:hover {
+      background: #555;
+    }
+    .search-box {
+      padding: 10px;
+      background: #1a1a1a;
+    }
+    .search-box input {
+      padding: 8px;
+      width: 250px;
+      border-radius: 5px;
+      border: none;
+      outline: none;
+    }
+    main {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+    }
+    .video-container iframe {
+      width: 100%;
+      max-width: 800px;
+      height: 450px;
+      border: none;
+      border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(255, 255, 255, 0.2);
+    }
+    .video-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      justify-content: center;
+      margin-top: 30px;
+    }
+    .video-item {
+      width: 180px;
+      background: #222;
+      border-radius: 8px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    .video-item:hover {
+      transform: scale(1.05);
+    }
+    .video-item img {
+      width: 100%;
+      height: 100px;
+      object-fit: cover;
+    }
+    .video-title {
+      padding: 10px;
+      font-size: 14px;
+      text-align: center;
+    }
+    #loadingText {
+      margin-top: 20px;
+      display: none;
+    }
+    mark {
+      background: yellow;
+      color: black;
+    }
+  </style>
 </head>
 <body>
-    <h1>Porn Video Player</h1>
+  <header>
+    <button class="category-btn" onclick="setCategory('BD')">BD</button>
+    <button class="category-btn" onclick="setCategory('Russian')">Russian</button>
+    <!-- Add more buttons if needed -->
+  </header>
+
+  <div class="search-box">
+    <input type="text" id="searchInput" placeholder="Search video title..." oninput="displayVideoList()" />
+  </div>
+
+  <main>
+    <h2>Selected Video</h2>
     <div class="video-container">
-        <iframe id="videoFrame"></iframe>
+      <iframe id="videoFrame" allowfullscreen></iframe>
     </div>
-    <div class="btn-container">
-        <button onclick="loadNextVideo()">Next Video</button>
-    </div>
-    <p id="loadingText" class="loading">Loading...</p>
+    <p id="loadingText">Loading...</p>
 
-    <script>
-        let videos = [];
-        let lastIndex = -1; // To track the last played video index
+    <h3 style="margin-top:40px;">Choose a Video</h3>
+    <div id="videoList" class="video-list"></div>
+  </main>
 
-        async function fetchVideos() {
-            try {
-                document.getElementById("loadingText").style.display = "block";
-                let response = await fetch("mahabub.json");
-                let data = await response.json();
-                videos = data.videos;
-                document.getElementById("loadingText").style.display = "none";
-                loadNextVideo();
-            } catch (error) {
-                console.error("Error fetching videos:", error);
-                document.getElementById("loadingText").textContent = "Failed to load videos.";
-            }
-        }
+  <script>
+    let videos = {};
+    let currentCategory = "";
 
-        function loadNextVideo() {
-            if (videos.length === 0) return;
+    async function fetchVideos() {
+      document.getElementById("loadingText").style.display = "block";
+      try {
+        const res = await fetch("videos.json");
+        videos = await res.json();
+        document.getElementById("loadingText").style.display = "none";
+      } catch (err) {
+        console.error("Error loading videos:", err);
+        document.getElementById("loadingText").textContent = "Failed to load videos.";
+      }
+    }
 
-            let newIndex;
-            do {
-                newIndex = Math.floor(Math.random() * videos.length);
-            } while (newIndex === lastIndex); // Ensure it's not the same video as last time
+    function setCategory(category) {
+      currentCategory = category;
+      document.getElementById("searchInput").value = ""; // Clear search on category change
+      displayVideoList();
+    }
 
-            lastIndex = newIndex; // Update last played video index
-            let videoURL = videos[newIndex].replace("/view", "/preview");
-            document.getElementById("videoFrame").src = videoURL;
-        }
+    function displayVideoList() {
+      const container = document.getElementById("videoList");
+      container.innerHTML = "";
 
-        fetchVideos();
-    </script>
+      if (!videos[currentCategory]) return;
+
+      const searchTerm = document.getElementById("searchInput").value.toLowerCase();
+
+      const filtered = videos[currentCategory].filter(video =>
+        video.title.toLowerCase().includes(searchTerm)
+      );
+
+      filtered.forEach(video => {
+        const item = document.createElement("div");
+        item.className = "video-item";
+        item.onclick = () => playVideo(video.url);
+
+        const highlightedTitle = video.title.replace(
+          new RegExp(searchTerm, "gi"),
+          match => `<mark>${match}</mark>`
+        );
+
+        item.innerHTML = `
+          <img src="${video.thumbnail}" alt="${video.title}">
+          <div class="video-title">${highlightedTitle}</div>
+        `;
+
+        container.appendChild(item);
+      });
+
+      if (filtered[0]) {
+        playVideo(filtered[0].url);
+      } else {
+        document.getElementById("videoFrame").src = "";
+      }
+    }
+
+    function playVideo(url) {
+      document.getElementById("videoFrame").src = url;
+    }
+
+    fetchVideos();
+  </script>
 </body>
 </html>
