@@ -3,180 +3,154 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Category Video Player</title>
+  <title>Video Gallery</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background: #121212;
-      color: white;
       margin: 0;
-    }
-    header {
-      display: flex;
-      padding: 10px;
-      background: #1a1a1a;
-      gap: 10px;
-    }
-    .category-btn {
-      padding: 8px 16px;
-      background: #333;
-      border: none;
-      border-radius: 4px;
-      color: white;
-      cursor: pointer;
-    }
-    .category-btn:hover {
-      background: #555;
-    }
-    .search-box {
-      padding: 10px;
-      background: #1a1a1a;
-    }
-    .search-box input {
-      padding: 8px;
-      width: 250px;
-      border-radius: 5px;
-      border: none;
-      outline: none;
-    }
-    main {
+      padding: 0;
+      background: #121212;
+      color: #fff;
+      font-family: Arial, sans-serif;
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 20px;
     }
-    .video-container iframe {
+    header {
+      padding: 10px;
+      background: #1f1f1f;
       width: 100%;
+      text-align: center;
+    }
+    .controls {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
+      padding: 10px;
+    }
+    .controls button {
+      padding: 10px 15px;
+      border: none;
+      background: #333;
+      color: white;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .controls input {
+      padding: 10px;
+      border-radius: 5px;
+      border: none;
+      width: 200px;
+    }
+    #videoPlayer {
+      width: 90%;
       max-width: 800px;
       height: 450px;
-      border: none;
-      border-radius: 8px;
-      box-shadow: 0 4px 10px rgba(255, 255, 255, 0.2);
+      background: black;
+      margin-top: 15px;
     }
-    .video-list {
+    .gallery {
       display: flex;
       flex-wrap: wrap;
-      gap: 16px;
+      gap: 15px;
       justify-content: center;
-      margin-top: 30px;
+      margin: 20px;
     }
-    .video-item {
-      width: 180px;
+    .thumb {
       background: #222;
       border-radius: 8px;
       overflow: hidden;
       cursor: pointer;
-      transition: transform 0.2s;
+      width: 180px;
+      text-align: center;
+      padding-bottom: 10px;
     }
-    .video-item:hover {
-      transform: scale(1.05);
-    }
-    .video-item img {
+    .thumb img {
       width: 100%;
       height: 100px;
       object-fit: cover;
     }
-    .video-title {
-      padding: 10px;
+    .thumb p {
+      margin: 5px;
       font-size: 14px;
-      text-align: center;
-    }
-    #loadingText {
-      margin-top: 20px;
-      display: none;
-    }
-    mark {
-      background: yellow;
-      color: black;
     }
   </style>
 </head>
 <body>
   <header>
-    <button class="category-btn" onclick="setCategory('BD')">BD</button>
-    <button class="category-btn" onclick="setCategory('Russian')">Russian</button>
-    <!-- Add more buttons if needed -->
+    <h2>Video Gallery</h2>
   </header>
 
-  <div class="search-box">
-    <input type="text" id="searchInput" placeholder="Search video title..." oninput="displayVideoList()" />
+  <div class="controls">
+    <button onclick="changeCategory('BD')">BD</button>
+    <button onclick="changeCategory('Russian')">Russian</button>
+    <input type="text" id="searchInput" placeholder="Search..." oninput="renderGallery()" />
   </div>
 
-  <main>
-    <h2>Selected Video</h2>
-    <div class="video-container">
-      <iframe id="videoFrame" allowfullscreen></iframe>
-    </div>
-    <p id="loadingText">Loading...</p>
+  <video id="videoPlayer" controls autoplay></video>
 
-    <h3 style="margin-top:40px;">Choose a Video</h3>
-    <div id="videoList" class="video-list"></div>
-  </main>
+  <div class="gallery" id="gallery"></div>
 
   <script>
-    let videos = {};
-    let currentCategory = "";
+    const videos = {
+      BD: [
+        {
+          title: "টিকটকার ridhi এর ভাইরাল ভিডিও",
+          thumbnail: "https://via.placeholder.com/180x100?text=BD+1",
+          url: "https://www.w3schools.com/html/mov_bbb.mp4"
+        },
+        {
+          title: "টিকটকার ridhi এর ভাইরাল ভিডিও",
+          thumbnail: "https://via.placeholder.com/180x100?text=BD+2",
+          url: "https://www.w3schools.com/html/mov_bbb.mp4"
+        }
+      ],
+      Russian: [
+        {
+          title: "Russian Dance",
+          thumbnail: "https://via.placeholder.com/180x100?text=Russian+1",
+          url: "https://drive.google.com/uc?export=download&id=1R3NDM7bUIxQRaV9HlmTGw2FWPcCjCGcp"
+        }
+      ]
+    };
 
-    async function fetchVideos() {
-      document.getElementById("loadingText").style.display = "block";
-      try {
-        const res = await fetch("videos.json");
-        videos = await res.json();
-        document.getElementById("loadingText").style.display = "none";
-      } catch (err) {
-        console.error("Error loading videos:", err);
-        document.getElementById("loadingText").textContent = "Failed to load videos.";
-      }
+    let currentCategory = 'BD';
+
+    function changeCategory(cat) {
+      currentCategory = cat;
+      renderGallery();
     }
 
-    function setCategory(category) {
-      currentCategory = category;
-      document.getElementById("searchInput").value = ""; // Clear search on category change
-      displayVideoList();
-    }
-
-    function displayVideoList() {
-      const container = document.getElementById("videoList");
+    function renderGallery() {
+      const container = document.getElementById("gallery");
+      const search = document.getElementById("searchInput").value.toLowerCase();
       container.innerHTML = "";
 
-      if (!videos[currentCategory]) return;
-
-      const searchTerm = document.getElementById("searchInput").value.toLowerCase();
-
-      const filtered = videos[currentCategory].filter(video =>
-        video.title.toLowerCase().includes(searchTerm)
+      const filtered = videos[currentCategory].filter(v =>
+        v.title.toLowerCase().includes(search)
       );
 
-      filtered.forEach(video => {
-        const item = document.createElement("div");
-        item.className = "video-item";
-        item.onclick = () => playVideo(video.url);
-
-        const highlightedTitle = video.title.replace(
-          new RegExp(searchTerm, "gi"),
-          match => `<mark>${match}</mark>`
-        );
-
-        item.innerHTML = `
-          <img src="${video.thumbnail}" alt="${video.title}">
-          <div class="video-title">${highlightedTitle}</div>
-        `;
-
-        container.appendChild(item);
-      });
-
-      if (filtered[0]) {
-        playVideo(filtered[0].url);
-      } else {
-        document.getElementById("videoFrame").src = "";
+      if (filtered.length === 0) {
+        container.innerHTML = "<p>No videos found.</p>";
+        return;
       }
+
+      filtered.forEach(video => {
+        const div = document.createElement("div");
+        div.className = "thumb";
+        div.onclick = () => {
+          document.getElementById("videoPlayer").src = video.url;
+        };
+        div.innerHTML = `
+          <img src="${video.thumbnail}" alt="thumb" />
+          <p>${video.title}</p>
+        `;
+        container.appendChild(div);
+      });
     }
 
-    function playVideo(url) {
-      document.getElementById("videoFrame").src = url;
-    }
-
-    fetchVideos();
+    // Initial render
+    renderGallery();
   </script>
 </body>
 </html>
