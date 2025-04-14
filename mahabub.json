@@ -1,12 +1,27 @@
 {
-    "videos": [
-    "https://drive.google.com/file/d/1R3NDM7bUIxQRaV9HlmTGw2FWPcCjCGcp/view",
-    "https://drive.google.com/file/d/1R32uY_ZAHwa_tvGvOk0LiZEZv67WC3Rq/view",
-    "https://drive.google.com/file/d/1RA4QEcJE3fTqdJ1XyfAqEA40yNICk0Tr/view",
-    "https://drive.google.com/file/d/1RA_6qZr1V2nled-hUWusl7E5r_I8J0nG/view",
-    "https://drive.google.com/file/d/1pIYB-5C4lFCwjnbi0__JEPxIiJmaef6l/view?usp=drivesdk",
-    "https://drive.google.com/file/d/1pWqOFY_fxmVX3ECc6cHhQOIKEzoQbHZz/view?usp=drivesdk",
-    "https://drive.google.com/file/d/1pa4RBfE-j54vBUlfhjPNgxsxq33IWK-P/view?usp=drivesdk",
-    "https://drive.google.com/file/d/1pfQAl70gDAzsYbA-lPUh6UbGqFngLxhG/view?usp=drivesdk"
-    ]
+  "BD": [
+    {
+      "title": "Funny BD Video",
+      "thumbnail": "https://via.placeholder.com/180x100?text=BD+1",
+      "url": "https://example.com/bd1.mp4"
+    },
+    {
+      "title": "Drama BD Scene",
+      "thumbnail": "https://via.placeholder.com/180x100?text=BD+2",
+      "url": "https://example.com/bd2.mp4"
+    }
+  ],
+  "Russian": [
+    {
+      "title": "Russian Dance",
+      "thumbnail": "https://via.placeholder.com/180x100?text=Russian+1",
+      "url": "https://drive.google.com/file/d/1R3NDM7bUIxQRaV9HlmTGw2FWPcCjCGcp/view"
+    }
+  ]
 }
+
+
+
+
+
+
