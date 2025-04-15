@@ -93,29 +93,18 @@
   <div class="gallery" id="gallery"></div>
 
   <script>
-    const videos = {
-      BD: [
-        {
-          title: "টিকটকার ridhi এর ভাইরাল ভিডিও",
-          thumbnail: "https://via.placeholder.com/180x100?text=BD+1",
-          url: "https://drive.google.com/file/d/1R3NDM7bUIxQRaV9HlmTGw2FWPcCjCGcp/view"
-        },
-        {
-          title: "আরেকটা ভিডিও",
-          thumbnail: "https://via.placeholder.com/180x100?text=BD+2",
-          url: "https://drive.google.com/file/d/1DqfF1wT9A_fake_demo_url/view"
-        }
-      ],
-      Russian: [
-        {
-          title: "Russian Dance",
-          thumbnail: "https://via.placeholder.com/180x100?text=Russian+1",
-          url: "https://drive.google.com/file/d/1R3NDM7bUIxQRaV9HlmTGw2FWPcCjCGcp/view"
-        }
-      ]
-    };
-
+    let videos = {};
     let currentCategory = 'BD';
+
+    async function fetchVideos() {
+      try {
+        const res = await fetch('video.json');
+        videos = await res.json();
+        renderGallery();
+      } catch (err) {
+        console.error("Failed to load video.json:", err);
+      }
+    }
 
     function changeCategory(cat) {
       currentCategory = cat;
@@ -126,6 +115,8 @@
       const container = document.getElementById("gallery");
       const search = document.getElementById("searchInput").value.toLowerCase();
       container.innerHTML = "";
+
+      if (!videos[currentCategory]) return;
 
       const filtered = videos[currentCategory].filter(v =>
         v.title.toLowerCase().includes(search)
@@ -153,8 +144,8 @@
       });
     }
 
-    // Initial render
-    renderGallery();
+    // Load videos from JSON on start
+    fetchVideos();
   </script>
 </body>
 </html>
